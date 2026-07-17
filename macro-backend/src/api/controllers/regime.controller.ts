@@ -1,10 +1,11 @@
-import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Headers, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual } from 'typeorm';
 import { RegimeSnapshot } from '../../database/entities/regime-snapshot.entity';
 import { ThresholdsConfig } from '../../database/entities/thresholds-config.entity';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { DateQueryDto } from '../dto/date-query.dto';
+import { DataSchedulerService } from '../../data-fetcher/services/data-scheduler.service';
 
 @Controller('api/v1/regime')
 export class RegimeController {
@@ -13,6 +14,7 @@ export class RegimeController {
     private snapshotRepo: Repository<RegimeSnapshot>,
     @InjectRepository(ThresholdsConfig)
     private thresholdsRepo: Repository<ThresholdsConfig>,
+    private scheduler: DataSchedulerService,
   ) {}
 
   @Get('current')
@@ -63,6 +65,16 @@ export class RegimeController {
     }
     const thresholds = await this.getLatestThresholds();
     return this.formatResponse(snapshot, thresholds);
+  }
+
+  @Get('refresh')
+  async refresh(@Headers('authorization') auth?: string) {
+    const secret = process.env.CRON_SECRET;
+    if (secret && auth !== `Bearer ${secret}`) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    await this.scheduler.runClassification();
+    return { ok: true, ran_at: new Date().toISOString() };
   }
 
   private getLatestThresholds(): Promise<ThresholdsConfig | null> {

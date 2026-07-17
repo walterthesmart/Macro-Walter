@@ -15,6 +15,6 @@ import { DataSchedulerService } from './services/data-scheduler.service';
     RegimeModule,
   ],
   providers: [FredClient, DataAggregatorService, DataSchedulerService],
-  exports: [DataAggregatorService],
+  exports: [DataAggregatorService, DataSchedulerService],
 })
 export class DataFetcherModule {}

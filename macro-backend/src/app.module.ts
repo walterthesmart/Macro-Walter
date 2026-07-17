@@ -27,13 +27,18 @@ import { ApiModule } from './api/api.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get('DATABASE_URL'),
-        autoLoadEntities: true,
-        synchronize: true, // Use synchronize for dev instead of migrations
-        logging: config.get('NODE_ENV') !== 'production',
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbUrl = config.get<string>('DATABASE_URL') || '';
+        const isLocalDb = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1');
+        return {
+          type: 'postgres',
+          url: config.get('DATABASE_URL'),
+          autoLoadEntities: true,
+          synchronize: true, // Use synchronize for dev instead of migrations
+          logging: config.get('NODE_ENV') !== 'production',
+          ssl: isLocalDb ? false : { rejectUnauthorized: false },
+        };
+      },
     }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([RegimeSnapshot, ThresholdsConfig]),

@@ -63,3 +63,10 @@ pids
 
 
 macro-backend/.env
+
+# Env variants (keep example templates)
+.env.*
+!.env.example
+
+# Vercel
+.vercel
