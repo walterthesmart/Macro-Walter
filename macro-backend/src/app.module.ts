@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -10,6 +10,7 @@ import { ThresholdsConfig } from './database/entities/thresholds-config.entity';
 import { RegimeModule } from './regime/regime.module';
 import { DataFetcherModule } from './data-fetcher/data-fetcher.module';
 import { ApiModule } from './api/api.module';
+import { SitePasswordMiddleware } from './api/middleware/site-password.middleware';
 
 @Module({
   imports: [
@@ -53,4 +54,11 @@ import { ApiModule } from './api/api.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(SitePasswordMiddleware)
+      .exclude('api/v1/regime/refresh', 'api/v1/auth/verify')
+      .forRoutes('*');
+  }
+}

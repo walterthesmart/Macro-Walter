@@ -19,3 +19,15 @@ html.dark body {
   background-color: #020617;
   color: #f1f5f9;
 }
+
+@page { margin: 1.5cm; }
+
+@media print {
+  header, .no-print { display: none !important; }
+  html, body { background: #ffffff !important; color: #111827 !important; }
+  * { box-shadow: none !important; text-shadow: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .overflow-x-auto { overflow: visible !important; }
+  [class*="min-w-"] { min-width: 0 !important; }
+  div[class*="rounded-xl"] { break-inside: avoid-page; }
+  main { padding-top: 0 !important; }
+}

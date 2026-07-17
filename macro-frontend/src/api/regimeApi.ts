@@ -4,6 +4,29 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
 });
 
+// Attach the stored site password (if any) to every API request.
+api.interceptors.request.use((config) => {
+  const password = localStorage.getItem('site_password');
+  if (password) {
+    config.headers['x-site-password'] = password;
+  }
+  return config;
+});
+
+// A 401 from the API means the stored password is missing or stale
+// (e.g. changed server-side): clear it and reload so the auth gate
+// comes back up.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      localStorage.removeItem('site_password');
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  },
+);
+
 export type GrowthState = 'G+' | 'G=' | 'G-';
 export type InflationState = 'I+' | 'I=' | 'I-';
 
@@ -111,4 +134,23 @@ export async function fetchRegimeHistory(params: {
 export async function fetchRegimeSeries(limit = 500): Promise<RegimeHistoryResponse> {
   const { data } = await api.get('/api/v1/regime/history', { params: { limit } });
   return data;
+}
+
+/**
+ * Verify a password against the backend auth endpoint.
+ * Uses the PLAIN axios import (not the intercepted instance) so a
+ * wrong-password 401 does not clear localStorage / reload the page.
+ * Returns true on 200 (correct password, or SITE_PASSWORD unset on the
+ * backend), false on 401, and throws on network/other errors.
+ */
+export async function verifyPassword(password: string): Promise<boolean> {
+  try {
+    await axios.post(`${api.defaults.baseURL}/api/v1/auth/verify`, { password });
+    return true;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return false;
+    }
+    throw error;
+  }
 }
