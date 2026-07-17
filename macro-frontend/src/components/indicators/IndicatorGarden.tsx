@@ -253,7 +253,7 @@ export function IndicatorGarden({ snapshot, series }: IndicatorGardenProps) {
           decimals={0}
           accentHex="#0f766e"
           spark={buildSpark(series, (s) => s.raw_axes.net_liquidity)}
-          note="WALCL - TGA - ON RRP"
+          note="Fed Total Assets (WALCL) − Treasury General Account (TGA) − Overnight Reverse Repos (ON RRP)"
         />
       </Group>
     </div>
