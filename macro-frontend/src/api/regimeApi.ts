@@ -145,7 +145,7 @@ export async function fetchRegimeSeries(limit = 500): Promise<RegimeHistoryRespo
  */
 export async function verifyPassword(password: string): Promise<boolean> {
   try {
-    await axios.post(`${api.defaults.baseURL}/api/v1/auth/verify`, { password });
+    await axios.post('/api/v1/auth/verify', { password }, { baseURL: api.defaults.baseURL });
     return true;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
