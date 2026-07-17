@@ -1,0 +1,66 @@
+# Node.js
+node_modules/
+**/node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build Output
+dist/
+build/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python & Temporary Data
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+env/
+.env_python/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Temp/Script files mentioned earlier
+pdf_text.txt
+extract.py
+inspect_excel.py
+*.pdf
+*.csv
+*.xlsx
+
+# Local logs
+*.log
+logs
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+macro-backend/.env
+macro-backend/Dockerfile
